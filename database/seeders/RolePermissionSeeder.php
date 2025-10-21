@@ -37,8 +37,14 @@ class RolePermissionSeeder extends Seeder
 
         // Assign permissions to roles
         
+        echo "Total permissions in database: " . Permission::count() . "\n";
+        echo "Admin role ID: " . $admin->id . "\n";
+        echo "Manager role ID: " . $manager->id . "\n";
+        echo "Customer role ID: " . $customer->id . "\n";
+        
         // 🔥 ADMIN → Full Control (ALL 24 permissions)
         $admin->permissions()->sync(Permission::all()->pluck('id'));
+        echo "Admin permissions synced!\n";
 
         // 👔 MANAGER → Business Operations (15 permissions - no user management, no critical deletes)
         $managerPermissions = Permission::whereIn('name', [
@@ -53,7 +59,12 @@ class RolePermissionSeeder extends Seeder
             // Order Items: create, update, delete, view (full control)
             'create_order_items', 'update_order_items', 'delete_order_items', 'view_order_items'
         ])->pluck('id');
+        
+        echo "Manager permissions found: " . $managerPermissions->count() . "\n";
+        echo "Manager permissions IDs: " . $managerPermissions->implode(', ') . "\n";
+        
         $manager->permissions()->sync($managerPermissions);
+        echo "Manager permissions synced!\n";
 
         // 🛒 CUSTOMER → Limited Access (9 permissions - browse & own orders only)
         $customerPermissions = Permission::whereIn('name', [
@@ -68,7 +79,12 @@ class RolePermissionSeeder extends Seeder
             // Order Items: create, view, update (own items only)
             'create_order_items', 'view_order_items', 'update_order_items'
         ])->pluck('id');
+        
+        echo "Customer permissions found: " . $customerPermissions->count() . "\n";
+        echo "Customer permissions IDs: " . $customerPermissions->implode(', ') . "\n";
+        
         $customer->permissions()->sync($customerPermissions);
+        echo "Customer permissions synced!\n";
 
         // ✅ Assign roles to users by email instead of ID
         User::where('email', 'admin@example.com')->update(['role_id' => $admin->id]);
