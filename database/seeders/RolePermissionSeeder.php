@@ -37,29 +37,38 @@ class RolePermissionSeeder extends Seeder
 
         // Assign permissions to roles
         
-        // 🔥 ADMIN → Full access to everything
+        // 🔥 ADMIN → Full Control (ALL 24 permissions)
         $admin->permissions()->sync(Permission::all()->pluck('id'));
 
-        // 👔 MANAGER → Business operations (no user management or critical deletes)
-        $managerPermissions = Permission::where(function($query) {
-            $query->where('name', 'like', 'create_%')
-                  ->orWhere('name', 'like', 'update_%')
-                  ->orWhere('name', 'like', 'view_%');
-        })
-        ->whereNotIn('name', [
-            'create_users', 'update_users', 'delete_users', 'view_users', // No user management
-            'delete_product', 'delete_categories', 'delete_subcategories'  // No critical deletes
-        ])
-        ->pluck('id');
+        // 👔 MANAGER → Business Operations (15 permissions - no user management, no critical deletes)
+        $managerPermissions = Permission::whereIn('name', [
+            // Products: create, update, view (NO delete)
+            'create_product', 'update_product', 'view_product',
+            // Orders: create, update, delete, view (full control)
+            'create_order', 'update_order', 'delete_order', 'view_order',
+            // Categories: create, update, view (NO delete)
+            'create_categories', 'update_categories', 'view_categories',
+            // Subcategories: create, update, view (NO delete)
+            'create_subcategories', 'update_subcategories', 'view_subcategories',
+            // Order Items: create, update, delete, view (full control)
+            'create_order_items', 'update_order_items', 'delete_order_items', 'view_order_items'
+            // Users: NONE (no user management)
+        ])->pluck('id');
         $manager->permissions()->sync($managerPermissions);
 
-        // 🛒 CUSTOMER → Limited to viewing and own orders
+        // 🛒 CUSTOMER → Limited Access (9 permissions - browse & own orders only)
         $customerPermissions = Permission::whereIn('name', [
-            // View permissions for browsing
-            'view_product', 'view_categories', 'view_subcategories',
-            // Order management (own orders only)
+            // Products: view only
+            'view_product',
+            // Categories: view only
+            'view_categories',
+            // Subcategories: view only
+            'view_subcategories',
+            // Orders: create, view, update (own orders only)
             'create_order', 'view_order', 'update_order',
+            // Order Items: create, view, update (own items only)
             'create_order_items', 'view_order_items', 'update_order_items'
+            // Users: NONE
         ])->pluck('id');
         $customer->permissions()->sync($customerPermissions);
 
