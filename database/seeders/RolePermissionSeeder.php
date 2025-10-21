@@ -36,22 +36,32 @@ class RolePermissionSeeder extends Seeder
         }
 
         // Assign permissions to roles
-       // Admin → all permissions
-$admin->permissions()->sync(Permission::all()->pluck('id'));
+        
+        // 🔥 ADMIN → Full access to everything
+        $admin->permissions()->sync(Permission::all()->pluck('id'));
 
-// Manager → all except delete permissions
-// Manager → all except delete_*
-$manager->permissions()->sync(
-    Permission::whereNotLike('name', 'delete_%')
-              ->whereNotLike('name', 'create_users') // if manager shouldn't create users
-              ->pluck('id')
-);
+        // 👔 MANAGER → Business operations (no user management or critical deletes)
+        $managerPermissions = Permission::where(function($query) {
+            $query->where('name', 'like', 'create_%')
+                  ->orWhere('name', 'like', 'update_%')
+                  ->orWhere('name', 'like', 'view_%');
+        })
+        ->whereNotIn('name', [
+            'create_users', 'update_users', 'delete_users', 'view_users', // No user management
+            'delete_product', 'delete_categories', 'delete_subcategories'  // No critical deletes
+        ])
+        ->pluck('id');
+        $manager->permissions()->sync($managerPermissions);
 
-
-// Customer → view only + create_order
-$customer->permissions()->sync(Permission::where(function($q){
-    $q->where('name', 'create_order')->orWhere('name', 'like', 'view_%');
-})->pluck('id'));
+        // 🛒 CUSTOMER → Limited to viewing and own orders
+        $customerPermissions = Permission::whereIn('name', [
+            // View permissions for browsing
+            'view_product', 'view_categories', 'view_subcategories',
+            // Order management (own orders only)
+            'create_order', 'view_order', 'update_order',
+            'create_order_items', 'view_order_items', 'update_order_items'
+        ])->pluck('id');
+        $customer->permissions()->sync($customerPermissions);
 
 
         // ✅ Assign roles to users by email instead of ID
