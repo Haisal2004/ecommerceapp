@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;   
 use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 { 
+   // use HasRoles;
     use HasApiTokens, HasFactory, Notifiable;
 
      /**
@@ -37,6 +41,7 @@ class User extends Authenticatable
         'email',
         'phone',  // Add if you have this column
         'password',
+        'role_id',
     ];
 
     // Hidden fields
@@ -50,4 +55,22 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+  public function role()
+{
+    return $this->belongsTo(Role::class);
+}
+
+public function permissions()
+{
+   // return $this->role ? $this->role->permissions : collect([]);
+   return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id');
+}
+
+public function hasPermission($permissionName)
+{
+    return $this->permissions()->contains('name', $permissionName);
+}
+
+
+
 }

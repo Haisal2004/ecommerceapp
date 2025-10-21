@@ -6,26 +6,24 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
     // Register a new user
     public function register(Request $request)
     {
-        // validate input
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'phone' => 'required|numeric|unique:users', 
+            'phone' => 'required|numeric|unique:users',
             'password' => 'required|min:6'
-            
         ]);
 
-        // create new user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password), // password encrypted
+            'password' => Hash::make($request->password),
             'phone' => $request->phone,
         ]);
 
@@ -33,22 +31,50 @@ class AuthController extends Controller
     }
 
     // Login existing user
-     public function login(Request $request)
+    public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['error' => 'Invalid Credentials'], 401);
+        // Find user by email
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
-        $user = Auth::user();
+        // Create API token
+        $token = $user->createToken('Laravel')->accessToken;
 
-        // Create Passport token
-        $token = $user->createToken('MyAppToken')->accessToken;
+        // Get role name
+        $roleName = null;
+        $permissions = [];
+
+        if ($user->role_id) {
+            $role = DB::table('roles')->where('id', $user->role_id)->first();
+            $roleName = $role ? $role->name : null;
+
+            // Get permissions for this role
+            $permissions = DB::table('role_permissions')
+                ->join('permissions', 'role_permissions.permission_id', '=', 'permissions.id')
+                ->where('role_permissions.role_id', $user->role_id)
+                ->pluck('permissions.name')
+                ->toArray();
+        }
 
         return response()->json([
+            'message' => 'Login successful',
             'token' => $token,
-            'user'  => $user
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $roleName,
+                'permissions' => $permissions
+            ]
         ]);
     }
 }
+

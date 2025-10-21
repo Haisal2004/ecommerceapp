@@ -1,7 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Http\Resources\OrderResource;
@@ -38,3 +38,4 @@ class OrderController extends Controller
         return response()->json(null, 204);
     }
 }
+
