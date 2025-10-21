@@ -19,16 +19,16 @@ class RolePermissionSeeder extends Seeder
         // Permissions
         $permissions = [
             'create_product','update_product','delete_product','view_product',
-    // Orders
-    'create_order','update_order','delete_order','view_order',
-    // Users
-    'create_users','update_users','delete_users','view_users',
-    // Categories
-    'create_categories','update_categories','delete_categories','view_categories',
-    // Subcategories
-    'create_subcategories','update_subcategories','delete_subcategories','view_subcategories',
-    // Order Items
-    'create_order_items','update_order_items','delete_order_items','view_order_items',
+            // Orders
+            'create_order','update_order','delete_order','view_order',
+            // Users
+            'create_users','update_users','delete_users','view_users',
+            // Categories
+            'create_categories','update_categories','delete_categories','view_categories',
+            // Subcategories
+            'create_subcategories','update_subcategories','delete_subcategories','view_subcategories',
+            // Order Items
+            'create_order_items','update_order_items','delete_order_items','view_order_items',
         ];
 
         foreach ($permissions as $perm) {
@@ -52,7 +52,6 @@ class RolePermissionSeeder extends Seeder
             'create_subcategories', 'update_subcategories', 'view_subcategories',
             // Order Items: create, update, delete, view (full control)
             'create_order_items', 'update_order_items', 'delete_order_items', 'view_order_items'
-            // Users: NONE (no user management)
         ])->pluck('id');
         $manager->permissions()->sync($managerPermissions);
 
@@ -68,10 +67,8 @@ class RolePermissionSeeder extends Seeder
             'create_order', 'view_order', 'update_order',
             // Order Items: create, view, update (own items only)
             'create_order_items', 'view_order_items', 'update_order_items'
-            // Users: NONE
         ])->pluck('id');
         $customer->permissions()->sync($customerPermissions);
-
 
         // ✅ Assign roles to users by email instead of ID
         User::where('email', 'admin@example.com')->update(['role_id' => $admin->id]);
@@ -79,4 +76,3 @@ class RolePermissionSeeder extends Seeder
         User::where('email', 'customer@example.com')->update(['role_id' => $customer->id]);
     }
 }
-
