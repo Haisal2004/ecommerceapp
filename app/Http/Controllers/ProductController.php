@@ -13,7 +13,21 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('subcategory.category')->get();
-        return ProductResource::collection($products);
+        
+        // Debug: Let's see what we're actually getting
+        return response()->json([
+            'debug_info' => [
+                'total_products' => $products->count(),
+                'raw_products' => $products->toArray(),
+                'first_product_raw' => $products->first() ? $products->first()->toArray() : null,
+                'relationships_loaded' => $products->first() ? [
+                    'has_subcategory' => $products->first()->subcategory ? true : false,
+                    'subcategory_data' => $products->first()->subcategory ? $products->first()->subcategory->toArray() : null,
+                    'has_category' => ($products->first()->subcategory && $products->first()->subcategory->category) ? true : false
+                ] : null
+            ],
+            'formatted_data' => ProductResource::collection($products)
+        ]);
     }
 
     public function store(StoreProductRequest $request)
