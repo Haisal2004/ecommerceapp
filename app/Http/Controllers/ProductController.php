@@ -13,6 +13,16 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('subcategory.category')->get();
+        
+        // Debug: Check what we're getting
+        if ($products->isEmpty()) {
+            return response()->json([
+                'message' => 'No products found in database',
+                'total_products' => $products->count(),
+                'suggestion' => 'Create products via POST /api/products first'
+            ]);
+        }
+        
         return ProductResource::collection($products);
     }
 
