@@ -19,14 +19,14 @@ class StoreUserRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
-        return [
+   public function rules(): array
+{
+    return [
         'name'     => 'required|string|max:255',
         'phone'    => 'required|string|max:15|unique:users,phone',
         'email'    => 'required|email|unique:users,email',
         'password' => 'required|string|min:6',
-    
-        ];
-    }
+        'role_id'  => 'nullable|exists:roles,id',  // ← This line was added
+    ];
+}
 }

@@ -9,18 +9,23 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up()
+  public function up()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->string('role')->default('customer'); // admin, manager, customer
+        if (!Schema::hasColumn('users', 'role_id')) {
+            $table->unsignedBigInteger('role_id')->after('id');
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+        }
     });
 }
 
 public function down()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('role');
+        $table->dropForeign(['role_id']);
+        $table->dropColumn('role_id');
     });
 }
+
 
 };

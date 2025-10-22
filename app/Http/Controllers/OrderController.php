@@ -19,21 +19,25 @@ class OrderController extends Controller
         return new OrderResource($order);
     }
 
-    public function show($id)
+    //public function show($id)
+     public function show(Order $order)
     {
-        return new OrderResource(Order::findOrFail($id));
+        //return new OrderResource(Order::findOrFail($id));
+        return new OrderResource($order);
     }
 
-    public function update(Request $request, $id)
+   // public function update(Request $request, $id)
+      public function update(Request $request, Order $order)
     {
-        $order = Order::findOrFail($id);
+       // $order = Order::findOrFail($id);
         $order->update($request->all());
         return new OrderResource($order);
     }
 
-    public function destroy($id)
+    //public function destroy($id)
+     public function destroy(Order $order)
     {
-        $order = Order::findOrFail($id);
+        //$order = Order::findOrFail($id);
         $order->delete();
         return response()->json(null, 204);
     }

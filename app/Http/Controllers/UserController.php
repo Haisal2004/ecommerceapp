@@ -17,18 +17,22 @@ class UserController extends Controller
     }
 
     // Create user
-    public function store(StoreUserRequest $request)
-    {
-        $user = User::create([
-            'name'     => $request->name,
-            'phone'    => $request->phone,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password), // always hash!
-        ]);
+   public function store(StoreUserRequest $request)
+{
+    // Get default role (customer) if no role_id provided
+    $defaultRoleId = $request->role_id ?? \App\Models\Role::where('name', 'customer')->first()->id;
+    
+    $user = User::create([
+        'name'     => $request->name,
+        'phone'    => $request->phone,
+        'email'    => $request->email,
+        'password' => Hash::make($request->password),
+        'role_id'  => $defaultRoleId,  // ← This line was added
+    ]);
 
-        return new UserResource($user);
-    }
-
+    $user->load('userRole');  // ← This line was added
+    return new UserResource($user);
+}
     // Show one user
     public function show(User $user)
     {

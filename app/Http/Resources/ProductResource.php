@@ -17,8 +17,15 @@ public function toArray($request)
     return [
         'id' => $this->id,
         'name' => $this->name,
-        'subcategory' => new SubcategoryResource($this->subcategory),
-        'category' => $this->subcategory ? new CategoryResource($this->subcategory->category) : null,
+      //  'subcategory' => new SubcategoryResource($this->subcategory),
+      //  'category' => $this->subcategory ? new CategoryResource($this->subcategory->category) : null,
+      'subcategory' => $this->whenLoaded('subcategory', function () {
+            return new SubcategoryResource($this->subcategory);
+        }),
+        'category' => $this->whenLoaded('subcategory', function () {
+            return $this->subcategory && $this->subcategory->category ? 
+                new CategoryResource($this->subcategory->category) : null;
+        }),
         'price' => $this->price,
         'stock' => $this->stock,
     ];

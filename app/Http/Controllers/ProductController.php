@@ -31,6 +31,7 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $product->update($request->validated());
+        $product->refresh(); 
         $product->load('subcategory.category');
         return new ProductResource($product);
     }

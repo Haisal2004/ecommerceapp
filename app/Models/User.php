@@ -35,6 +35,8 @@ class User extends Authenticatable
             }
         });
     }
+    
+     protected $with = ['userRole'];
     // Mass assignable
     protected $fillable = [
         'name',
@@ -55,21 +57,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-  public function role()
+public function userRole()
 {
-    return $this->belongsTo(Role::class);
-}
-
-public function permissions()
-{
-   // return $this->role ? $this->role->permissions : collect([]);
-   return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id');
+    return $this->belongsTo(Role::class, 'role_id', 'id');
 }
 
 public function hasPermission($permissionName)
 {
-    return $this->permissions()->contains('name', $permissionName);
+    return $this->role && $this->role->permissions->contains('name', $permissionName);
 }
+
+public function hasRole($roleName)
+{
+    return $this->role && $this->role->name === $roleName;
+}
+
 
 
 

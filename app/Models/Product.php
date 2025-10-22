@@ -4,6 +4,7 @@ namespace App\Models;
 
 
 use App\Models\Subcategory;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
@@ -51,7 +52,8 @@ class Product extends Model
     // Access category via subcategory
     public function category()
     {
-        return $this->subcategory->category();
+        //return $this->subcategory->category();
+        return $this->hasOneThrough(Category::class, Subcategory::class, 'id', 'id', 'subcategory_id', 'category_id');
     }
 
 
