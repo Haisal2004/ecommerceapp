@@ -41,17 +41,20 @@ class RolePermissionSeeder extends Seeder
 $admin->permissions()->sync(Permission::all()->pluck('id'));
 
 // Manager → specific permissions
-$managerPermissions = Permission::whereIn('name', [
+$managerPermissions = Permission::whereIn('name', [ 
+    'create_users', // ← add this
+    'update_users', // if needed
+    'view_users',   // if needed
     'create_product', 'update_product', 'view_product',
-    'create_order', 'update_order', 'delete_order', 'view_order',
+    'create_order', 'update_order', 'view_order',
     'create_categories', 'update_categories', 'view_categories',
     'create_subcategories', 'update_subcategories', 'view_subcategories',
-    'create_order_items', 'update_order_items', 'delete_order_items', 'view_order_items'
+    'create_order_items', 'update_order_items', 'view_order_items'
 ])->pluck('id');
 $manager->permissions()->sync($managerPermissions);
 
 // Customer → specific permissions
-$customerPermissions = Permission::whereIn('name', [
+$customerPermissions = Permission::whereIn('name', [ 'view_users',
     'view_product', 'view_categories', 'view_subcategories',
     'create_order', 'view_order', 'update_order',
     'create_order_items', 'view_order_items', 'update_order_items'

@@ -47,6 +47,7 @@ class UserController extends Controller
             $data['password'] = Hash::make($data['password']);
         }
         $user->update($data);
+        $user->load('userRole');
 
         return new UserResource($user);
     }
