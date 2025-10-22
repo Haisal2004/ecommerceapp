@@ -42,6 +42,16 @@ class Product extends Model
         'subcategory_id',
     ];
 
+    /**
+     * Customize route model binding to always load relationships
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where($field ?? $this->getRouteKeyName(), $value)
+                   ->with('subcategory.category')
+                   ->first();
+    }
+
     // Relationship with category
     // Relationship with subcategory
  public function subcategory()

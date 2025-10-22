@@ -19,6 +19,7 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         $product = Product::create($request->validated());
+        $product->load('subcategory.category');
         return new ProductResource($product);
     }
 
