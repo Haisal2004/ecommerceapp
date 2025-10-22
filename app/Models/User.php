@@ -35,6 +35,9 @@ class User extends Authenticatable
             }
         });
     }
+    // Always load these relationships
+    protected $with = ['userRole'];
+
     // Mass assignable
     protected $fillable = [
         'name',
