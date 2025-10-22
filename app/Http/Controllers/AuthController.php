@@ -45,6 +45,9 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
+        // Revoke all existing tokens for this user
+        $user->tokens()->delete();
+        
         // Create API token
         $token = $user->createToken('Laravel')->accessToken;
 
