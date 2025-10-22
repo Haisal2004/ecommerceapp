@@ -25,6 +25,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
+            'role_id' => 3, // Default to customer role
         ]);
 
         return response()->json($user, 201);
