@@ -55,20 +55,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-  public function role()
+  public function userRole()
 {
-    return $this->belongsTo(Role::class);
+    return $this->belongsTo(Role::class, 'role_id', 'id');
 }
 
 public function permissions()
 {
-   // return $this->role ? $this->role->permissions : collect([]);
-   return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id');
+    return $this->userRole ? $this->userRole->permissions : collect([]);
 }
 
 public function hasPermission($permissionName)
 {
-    return $this->permissions()->contains('name', $permissionName);
+    return $this->userRole && $this->userRole->permissions()->where('name', $permissionName)->exists();
 }
 
 
